@@ -81,12 +81,6 @@ const State = struct {
             }
         }
         return differing_fields;
-        // if (self.bold != default_state.bold) differing_fields += 1;
-        // if (self.underscore != default_state.underscore) differing_fields += 1;
-        // if (self.blink != default_state.blink) differing_fields += 1;
-        // if (self.hidden != default_state.hidden) differing_fields += 1;
-        // if (self.fg) |fg| differing_fields += 1;
-        // if (self.bg) |bg| differing_fields += 1;
     }
 
     pub fn write_all_open_spans(self: *@This(), output: anytype, color_class_buf: []u8) !void {

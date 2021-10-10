@@ -443,8 +443,8 @@ fn process_stream(input: anytype, output: anytype) !void {
                             std.log.debug("todo: {s}", .{todo});
 
                             switch (todo) {
-                                .Incremental => |span| {
-                                    const tag = try std.fmt.bufPrint(span_buf[0..], SPAN_OPEN, .{span});
+                                .Incremental => |class_name| {
+                                    const tag = try std.fmt.bufPrint(span_buf[0..], SPAN_OPEN, .{class_name});
                                     try writer.writeAll(tag);
                                 },
                                 .Rebuild => |close_count| {

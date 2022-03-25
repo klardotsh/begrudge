@@ -7,6 +7,7 @@ const eql = std.mem.eql;
 const expect = std.testing.expect;
 const expectEqual = std.testing.expectEqual;
 const expectEqualStrings = std.testing.expectEqualStrings;
+const test_allocator = std.testing.allocator;
 const trimLeft = std.mem.trimLeft;
 
 const ESCAPE_1 = '\u{001b}';
@@ -110,7 +111,7 @@ const State = struct {
         }
     }
 
-    pub fn write_close_spans(self: *@This(), output: anytype, count: u8) !void {
+    pub fn write_close_spans(_: *@This(), output: anytype, count: u8) !void {
         var close_idx: u8 = 0;
         while (close_idx < count) {
             try output.writeAll(SPAN_CLOSE);
@@ -383,6 +384,7 @@ pub fn main() anyerror!void {
     var buf_in = std.io.bufferedReader(in.reader());
     var buf_out = std.io.bufferedWriter(out.writer());
     try process_stream(&buf_in, &buf_out);
+    try buf_out.flush();
 }
 
 fn process_stream(input: anytype, output: anytype) !void {
@@ -463,8 +465,6 @@ fn process_stream(input: anytype, output: anytype) !void {
         error.EndOfStream => {},
         else => std.log.err("error received: {s}", .{err}),
     }
-
-    try output.flush();
 }
 
 // NOTE: all the remaining tests are integration tests of the stream parser,
@@ -472,17 +472,22 @@ fn process_stream(input: anytype, output: anytype) !void {
 // and then wl-copy, so that the ANSI escape sequences would be reasonable-ish
 // to paste in (as opposed to needing to read files off the disk at test time)
 
-// ls -1 --color=always
+// ls -1 --color=always | hexdump -b | cut -c 9-
 //
 // this is probably the easiest case I've found: opens a bold and fg-4 sequence
 // that spans only a partial line on two lines, and the rest of the lines are
 // uncolored
 test "process_stream::simple" {
-    const ls_output =
-        \\G1swbRtbMDE7MzRtemlnLWNhY2hlG1swbS8KG1swMTszNG16aWctb3V0G1swbS8KG1swMG1iZWdy
-        \\dWRnZS56aWcbWzBtChtbMDBtYnVpbGQuemlnG1swbQobWzAwbUNPUFlJTkcbWzBtChtbMDBtUkVB
-        \\RE1FLm1kG1swbQo=
-    ;
+    const ls_output = [_]u8{
+        033, 133, 060, 155, 033, 133, 060, 061, 073, 063, 064, 155, 172, 151, 147, 055,
+        143, 141, 143, 150, 145, 033, 133, 060, 155, 057, 012, 033, 133, 060, 061, 073,
+        063, 064, 155, 172, 151, 147, 055, 157, 165, 164, 033, 133, 060, 155, 057, 012,
+        033, 133, 060, 060, 155, 142, 145, 147, 162, 165, 144, 147, 145, 056, 172, 151,
+        147, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 142, 165, 151, 154, 144,
+        056, 172, 151, 147, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 103, 117,
+        120, 131, 111, 116, 107, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 122,
+        105, 101, 104, 115, 105, 056, 155, 144, 033, 133, 060, 155, 012,
+    };
     const exp =
         \\<span class='begrudge-bold'><span class='begrudge-fg-4'>zig-cache</span></span>/
         \\<span class='begrudge-bold'><span class='begrudge-fg-4'>zig-out</span></span>/
@@ -492,6 +497,14 @@ test "process_stream::simple" {
         \\Makefile
         \\README.md
     ;
+
+    var output_buf: [4096]u8 = undefined;
+    var input = std.io.fixedBufferStream(ls_output[0..]);
+    var output = std.io.fixedBufferStream(output_buf[0..]);
+
+    try process_stream(&input, &output);
+
+    try expectEqualStrings(exp, output.getWritten());
 }
 
 comptime {

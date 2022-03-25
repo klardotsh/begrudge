@@ -48,7 +48,7 @@ decision, you have three options:
 - write it and submit a patch. I'll merge it if it's clean, tested code,
   even if it will, I insist, bring disorder and chaos to the cosmos
 - bug me about it until I cave and write a truecolor to `<span style=...>`
-  translator
+  translator some time in the next few decades, maybe
 
 ## Getting Started
 

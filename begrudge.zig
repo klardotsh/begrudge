@@ -138,9 +138,12 @@ const State = struct {
         return switch (mutation) {
             .Reset => blk: {
                 if (differing_fields == 0) break :blk null;
-                inline for (std.meta.fields(@This())) |field| {
-                    @field(self, field.name) = field.default_value.?;
-                }
+                self.bold = default_state.bold;
+                self.underscore = default_state.underscore;
+                self.blink = default_state.blink;
+                self.hidden = default_state.hidden;
+                self.fg = default_state.fg;
+                self.bg = default_state.bg;
                 break :blk OutputInstruction{ .Rebuild = differing_fields };
             },
             .BoldEnable => mutation_simple_enable(self, SPAN_CLASS_BOLD),
@@ -439,10 +442,10 @@ fn process_stream(input: anytype, output: anytype) !void {
                 if (is_end or sc == COMBO) {
                     const slice = if (is_end) seq[instruction_start..] else seq[instruction_start..idx];
                     if (Mutation.from_instruction(slice)) |mutation| {
-                        std.log.debug("mutation: {s}", .{mutation});
+                        std.log.debug("mutation: {any}", .{mutation});
 
                         if (try state.mutate(mutation, color_class_buf[0..])) |todo| {
-                            std.log.debug("todo: {s}", .{todo});
+                            std.log.debug("todo: {any}", .{todo});
 
                             switch (todo) {
                                 .Incremental => |class_name| {
@@ -463,7 +466,7 @@ fn process_stream(input: anytype, output: anytype) !void {
         }
     } else |err| switch (err) {
         error.EndOfStream => {},
-        else => std.log.err("error received: {s}", .{err}),
+        else => std.log.err("error received: {any}", .{err}),
     }
 }
 
@@ -479,14 +482,14 @@ fn process_stream(input: anytype, output: anytype) !void {
 // uncolored
 test "process_stream::simple" {
     const ls_output = [_]u8{
-        033, 133, 060, 155, 033, 133, 060, 061, 073, 063, 064, 155, 172, 151, 147, 055,
-        143, 141, 143, 150, 145, 033, 133, 060, 155, 057, 012, 033, 133, 060, 061, 073,
-        063, 064, 155, 172, 151, 147, 055, 157, 165, 164, 033, 133, 060, 155, 057, 012,
-        033, 133, 060, 060, 155, 142, 145, 147, 162, 165, 144, 147, 145, 056, 172, 151,
-        147, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 142, 165, 151, 154, 144,
-        056, 172, 151, 147, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 103, 117,
-        120, 131, 111, 116, 107, 033, 133, 060, 155, 012, 033, 133, 060, 060, 155, 122,
-        105, 101, 104, 115, 105, 056, 155, 144, 033, 133, 060, 155, 012,
+        33,  133, 60,  155, 33,  133, 60,  61,  73,  63,  64,  155, 172, 151, 147, 55,
+        143, 141, 143, 150, 145, 33,  133, 60,  155, 57,  12,  33,  133, 60,  61,  73,
+        63,  64,  155, 172, 151, 147, 55,  157, 165, 164, 33,  133, 60,  155, 57,  12,
+        33,  133, 60,  60,  155, 142, 145, 147, 162, 165, 144, 147, 145, 56,  172, 151,
+        147, 33,  133, 60,  155, 12,  33,  133, 60,  60,  155, 142, 165, 151, 154, 144,
+        56,  172, 151, 147, 33,  133, 60,  155, 12,  33,  133, 60,  60,  155, 103, 117,
+        120, 131, 111, 116, 107, 33,  133, 60,  155, 12,  33,  133, 60,  60,  155, 122,
+        105, 101, 104, 115, 105, 56,  155, 144, 33,  133, 60,  155, 12,
     };
     const exp =
         \\<span class='begrudge-bold'><span class='begrudge-fg-4'>zig-cache</span></span>/

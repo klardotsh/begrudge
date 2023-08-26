@@ -436,7 +436,7 @@ fn process_stream(input: anytype, output: anytype) !void {
         if (try reader.readUntilDelimiterOrEof(instruction_read_buf[0..], UNESCAPE)) |seq| {
             const last_possible_index = seq.len - 1;
             var instruction_start: usize = 0;
-            for (seq) |sc, idx| {
+            for (seq, 0..) |sc, idx| {
                 const is_end = idx == last_possible_index;
 
                 if (is_end or sc == COMBO) {
@@ -460,7 +460,7 @@ fn process_stream(input: anytype, output: anytype) !void {
                         }
                     }
 
-                    instruction_start = std.math.min(last_possible_index, idx + 1);
+                    instruction_start = @min(last_possible_index, idx + 1);
                 }
             }
         }

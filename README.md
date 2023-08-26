@@ -90,38 +90,10 @@ my other project (that spawned the idea for `begrudge` in the first place),
 [`gawsh`](https://github.com/klardotsh/gawsh) (still under extremely early
 development at time of writing).
 
-## Development, and The Boring Legal Part
+## Development Notes
 
 All commits should pass `make lint` and `make test` (CI will probably exist
 eventually). `begrudge` uses [Chronologic Versioning
 2019.05.19](https://chronver.org/spec/2019.05.19), tagged whenever the `main`
 branch looks good for a release. It's super informal, because this is a tiny
 tool that is unlikely to change often, if at all.
-
-`begrudge`'s implementation, specification, documentation, artwork, and other
-assets are all [Copyfree](http://copyfree.org/), released under the [Creative
-Commons Zero 1.0
-dedication](https://creativecommons.org/publicdomain/zero/1.0/). This means
-you're free to use it for any purpose, in any context, and without letting me
-know.
-
-Contributions will be considered, but are not guaranteed to be merged for any
-reason or no reason at all. By submitting a contribution to `begrudge`, you
-assert the following (this is the [Unlicense
-waiver](https://unlicense.org/WAIVER)):
-
-> I dedicate any and all copyright interest in this software to the
-> public domain. I make this dedication for the benefit of the public at
-> large and to the detriment of my heirs and successors. I intend this
-> dedication to be an overt act of relinquishment in perpetuity of all
-> present and future rights to this software under copyright law.
->
-> To the best of my knowledge and belief, my contributions are either
-> originally authored by me or are derived from prior works which I have
-> verified are also in the public domain and are not subject to claims
-> of copyright by other parties.
->
-> To the best of my knowledge and belief, no individual, business,
-> organization, government, or other entity has any copyright interest
-> in my contributions, and I affirm that I will not make contributions
-> that are otherwise encumbered.

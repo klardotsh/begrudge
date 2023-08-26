@@ -53,12 +53,11 @@ decision, you have three options:
 ## Getting Started
 
 To my knowledge, `begrudge` is not yet packaged anywhere. You'll need to build
-it from source using a Zig 0.8 compiler (newer Zigs, namely the 0.9 nightlies,
-may work, but as of yet are untested). The standard `zig build` workflow is
+it from source using a Zig 0.11 compiler. The standard `zig build` workflow is
 supported (and will be used in the below examples, though you're free to copy
 the resultant binary to wherever). There are no dependencies outside of the
-standard library. On Linux, at least, the produced binary has no sofile
-(dynamic linking) dependencies at runtime, either.
+standard library. On Linux, at least, the produced binary has no sofile (dynamic
+linking) dependencies at runtime, either.
 
 `begrudge` has no command line arguments: simply pipe ANSI-escaped data into
 it, and it will spit out the HTML span-ified version to standard output. For
